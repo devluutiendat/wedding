@@ -9,6 +9,9 @@
   --color-background-default: #c89d9c;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --font-main: var(--font-Comfortaa);
+  --font-great-vibes: var(--font-Great-Vibes);
+  --font-dancing-script: var(--font-Dancing-Script);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
