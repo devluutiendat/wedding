@@ -14,7 +14,7 @@ const Wisher = () => {
       <div className="container mx-auto px-4">
         <div className="mb-12 flex flex-col items-center text-center">
           <Image
-            src={"/couple/sec-title-flower.png"}
+            src={"/title-flower.png"}
             alt={"sec-title"}
             width={150}
             height={150}

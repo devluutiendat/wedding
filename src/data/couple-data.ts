@@ -1,3 +1,4 @@
+
 export const couple = [
      {
       name: "Thanh Hằng",
@@ -18,4 +19,4 @@ export const couple = [
         "Chàng trai đến từ Hải Phòng, hiện đang công tác tại Huyện đảo Cát Bà, Hải Phòng. Là một người sống nội tâm, thích đọc sách và yêu thiên nhiên. Với anh 'Tình yêu là sự kết nối giữa hai tâm hồn, là sự đồng điệu trong cảm xúc và suy nghĩ. Tình yêu không phải là một đích đến, mà là một hành trình mà chúng ta cùng nhau khám phá'",
     },
 ]
-  
+ 

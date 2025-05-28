@@ -1,3 +1,4 @@
+
 export const stories = [
     {
       id: 1,
@@ -32,3 +33,4 @@ export const stories = [
       image: "images/22719914bc26c1dd60ed3937f18afd71.jpeg",
     },
   ];
+

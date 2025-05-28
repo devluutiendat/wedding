@@ -1,101 +1,132 @@
 "use client";
-
-import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
+import { addWish } from "@/action/wishes";
+import { pdfConvert } from "@/lib/pdf-convert";
+import { sendMail } from "@/lib/send-email";
 
-export default function WishesForm() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    message: "",
+// Define form schema
+const formSchema = z.object({
+  name: z.string().min(1, "Họ tên là bắt buộc"),
+  email: z.string().email("Email không hợp lệ").optional().or(z.literal("")),
+  message: z.string().min(1, "Lời chúc là bắt buộc"),
+});
+
+const WishesForm = () => {
+  // 1. Define your form.
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      message: "",
+    },
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!formData.name || !formData.message) {
-      toast("Vui lòng điền đầy đủ thông tin", {
-        description: "Họ tên và lời chúc là bắt buộc",
-      });
-      return;
+  // 2. Define a submit handler.
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      const data = await pdfConvert();
+      sendMail({ sendTo: values.email!, invitation: data });
+      toast.success("Lời chúc đa da mau");
+    } catch (error) {
+      toast.error("Lời chúc không hợp lệ, vui lọng kiểm tra lai");
     }
-
-    setIsSubmitting(true);
-
-    // Simulate API call
-    setTimeout(() => {
-      toast("Gửi lời chúc thành công!", {
-        description: "Cảm ơn bạn đã gửi lời chúc đến đám cưới của chúng mình",
-      });
-
-      setFormData({
-        name: "",
-        email: "",
-        message: "",
-      });
-
-      setIsSubmitting(false);
-    }, 1000);
   };
 
   return (
-    <Card className="w-full border-2 border-background-default rounded-2xl shadow-lg">
+    <Card className="border-background-default w-full rounded-2xl border-2 shadow-lg">
       <CardContent className="p-6">
-        <form onSubmit={handleSubmit} className="space-y-4 ">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Input
+        {/* ShadCN Form */}
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {/* Name Field */}
+              <FormField
+                control={form.control}
                 name="name"
-                placeholder="Nhập họ tên*"
-                className="p-6"
-                value={formData.name}
-                onChange={handleChange}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Họ tên*</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Nhập họ tên"
+                        {...field}
+                        className="p-6"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div>
-              <Input
+
+              {/* Email Field */}
+              <FormField
+                control={form.control}
                 name="email"
-                type="email"
-                className="p-6"
-                placeholder="Nhập email"
-                value={formData.email}
-                onChange={handleChange}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        placeholder="Nhập email"
+                        {...field}
+                        className="p-6"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
             </div>
-          </div>
 
-          <div>
-            <Textarea
+            {/* Message Field */}
+            <FormField
+              control={form.control}
               name="message"
-              placeholder="Nhập lời chúc của bạn*"
-              rows={5}
-              value={formData.message}
-              onChange={handleChange}
-              className="min-h-[200px] p-6"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Lời chúc*</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Nhập lời chúc của bạn"
+                      {...field}
+                      rows={5}
+                      className="min-h-[200px] p-6"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-          </div>
 
-          <Button
-            type="submit"
-            className="w-full bg-background-default hover:bg-background-hover"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Đang gửi..." : `Gửi lời chúc`}
-          </Button>
-        </form>
+            <Button
+              type="submit"
+              className="bg-background-default hover:bg-background-hover w-full"
+              disabled={form.formState.isSubmitting}
+            >
+              {form.formState.isSubmitting ? "Đang gửi..." : "Gửi lời chúc"}
+            </Button>
+          </form>
+        </Form>
       </CardContent>
     </Card>
   );
-}
+};
+
+export default WishesForm;
