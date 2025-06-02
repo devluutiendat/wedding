@@ -14,9 +14,6 @@ const Header = () => {
     setOpen(false);
   };
 
-  useEffect(() => {
-    console.log("open", open);
-  }, [open]);
   return (
     <header>
       <div className="font-main text-font-default relative flex flex-col items-center justify-center pt-10 text-center">

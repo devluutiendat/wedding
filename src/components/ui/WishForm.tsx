@@ -16,13 +16,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { addWish } from "@/action/wishes";
-import { pdfConvert } from "@/lib/pdf-convert";
-import { sendMail } from "@/lib/send-email";
 
 // Define form schema
 const formSchema = z.object({
   name: z.string().min(1, "Họ tên là bắt buộc"),
-  email: z.string().email("Email không hợp lệ").optional().or(z.literal("")),
+  email: z.string().email("Email không hợp lệ").or(z.literal("")),
   message: z.string().min(1, "Lời chúc là bắt buộc"),
 });
 
@@ -40,11 +38,16 @@ const WishesForm = () => {
   // 2. Define a submit handler.
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const data = await pdfConvert();
-      sendMail({ sendTo: values.email!, invitation: data });
-      toast.success("Lời chúc đa da mau");
+      addWish({
+        name: values.name,
+        email: values.email,
+        content: values.message,
+      });
+      toast.success("Cảm ơn bạn đã để lại lời chúc");
     } catch (error) {
-      toast.error("Lời chúc không hợp lệ, vui lọng kiểm tra lai");
+      toast.error(
+        "Gửi lời chúc chưa thành công , vui lòng kiểm tra lai" + error,
+      );
     }
   };
 
